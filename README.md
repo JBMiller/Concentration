@@ -1,5 +1,4 @@
 ###Card Matching
-###============
 
 A card matching game (under development). Upon completion, the game will feature a table of face down cards. The player may flip two cards. If they match, they stay face-up. If they do not, they flip back down. The goal will be to match all of the cards in the given timelimit.
 
