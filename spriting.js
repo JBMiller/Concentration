@@ -1,4 +1,5 @@
-// Copyright 2013 William Malone (www.williammalone.com)
+// Author Jonathan Miller
+// Original concept built off from William Malone (www.williammalone.com) (http://www.williammalone.com/articles/create-html5-canvas-javascript-sprite-animation/)
  
 (function() {
 	// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -30,6 +31,7 @@
 		};
 }());
 
+// Holds all visible cards
 var CardsArray = [];
 
 // Get canvas
@@ -38,7 +40,7 @@ canvas.width = 600;
 canvas.height = 300;
 
 // Create sprites
-for (var i = 0; i < FrameArray.length; i += 1) {
+for (var i = 0; i < FrameArray.length; i += 1) { // Single Frame Sprites
 	aCard = sprite({
 		frames: [FrameArray[i]],
 		ticksPerFrame: 0,
@@ -49,7 +51,7 @@ for (var i = 0; i < FrameArray.length; i += 1) {
 	});
 	CardsArray[CardsArray.length] = aCard;
 }
-for (var i = 0; i < FrameArray.length; i += 3) {
+for (var i = 0; i < FrameArray.length; i += 3) { // Multi Frame Sprites
 	aCard = sprite({
 		frames: [FrameArray[i], FrameArray[i + 1], FrameArray[i + 2]],
 		ticksPerFrame: 5,
@@ -61,6 +63,7 @@ for (var i = 0; i < FrameArray.length; i += 3) {
 	CardsArray[CardsArray.length] = aCard;
 }
 
+// Creates a complete sprite animation
 function sprite (options) {
 		
 	var theSprite = {},
@@ -73,7 +76,7 @@ function sprite (options) {
 		theSprite.frames[theSprite.frames.length] = options.frames[i];
 	}
 	if(theSprite.frames.length == 0){
-		alert("Error! Number Of Frames is 0! Sprite creation terminated");
+		console.error("Error! Number Of Frames is 0! Sprite creation terminated");
 		return;
 	}
 		
@@ -81,7 +84,6 @@ function sprite (options) {
 	theSprite.X = options.X || 0;
 	theSprite.Y = options.Y || 0;
 	theSprite.scale = options.scale || 1;
-	// theSprite.image = options.image;
 		
 	theSprite.update = function () {
 	    if (ticksPerFrame == 0)
