@@ -27,6 +27,18 @@ var ButtonArray = [];
 var sleep = 0;
 
 var numbSelectedCards = 0;
+var numbMatches = 0;
+var levelIndex = 0;
+// 2x2, 2x3, 2x4, 3x6, 4x8, 5x10
+var levels = { 
+    0: { cols: 2, totalMatches: 2 },
+    1: { cols: 2, totalMatches: 3 },
+    2: { cols: 2, totalMatches: 4 },
+    3: { cols: 3, totalMatches: 6 },
+    4: { cols: 4, totalMatches: 8 },
+    5: { cols: 5, totalMatches: 10 }
+};
+
 
 init();
 function init() {
@@ -35,6 +47,9 @@ function init() {
     ButtonArray = [];
     sleep = 0;
     numbSelectedCards = 0;
+    numbMatches = 0;
+    cols = levels[levelIndex].cols;
+    totalMatches = levels[levelIndex].totalMatches;
     // Create Bottom UI
 
     // Create Buttons
@@ -49,13 +64,10 @@ function init() {
     })
     ButtonArray[0] = aButton;
     // Create Cards
-    // 2x2, 2x3, 2x4, 3x6, 4x8, 5x10
     initFrames();
     shuffle(FrameArray);
     doubleUp(FrameArray);
-    var cols = 5;
-    var numbMatches = 10
-    for (var i = 0; i < numbMatches * 2; i += 1) {
+    for (var i = 0; i < totalMatches * 2; i += 1) {
         aCard = Card({
             matchID: i - (i % 2),
             cardFace: FrameArray[i],
@@ -91,6 +103,10 @@ function gameLoop() {
     for (var i = 0; i < CardsArray.length; ++i) {
         CardsArray[i].update();
         CardsArray[i].render();
+    }
+    if (numbMatches == totalMatches && levelIndex < 5) {
+        levelIndex++
+        init();
     }
 }
 
@@ -203,6 +219,7 @@ function CardClickHandler() {
             cardB.isMatched = true;
             cardA.isSelected = false;
             cardB.isSelected = false;
+            numbMatches++;
         }
         else
             sleep = 50;
