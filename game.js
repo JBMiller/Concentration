@@ -1,3 +1,7 @@
+/* 	Author: Jonathan B. Miller (http://jonathanbmiller.com)
+	Purpose: This file holds the major game loop functionality. It is dependant on "core.js" to function.
+	Special thanks to William Malone (www.williammalone.com) (http://www.williammalone.com/articles/create-html5-canvas-javascript-sprite-animation/)
+ */
 // Get canvas
 var mousePos = { x: 0, y: 0 };
 var canvas = document.getElementById("GameCanvas");
@@ -38,7 +42,8 @@ var levels = {
     4: { cols: 4, totalMatches: 8 },
     5: { cols: 5, totalMatches: 10 }
 };
-
+var startTime = Date.now();
+var timer = startTime - Date.now();
 
 init();
 function init() {
@@ -54,13 +59,13 @@ function init() {
 
     // Create Buttons
     var aButton = Button({
-        x: 200,
-        y: 440,
+        x: 380,
+        y: 435,
         width: 100,
         height: 50,
         text: "Restart",
         context: canvas.getContext("2d"),
-        action: function () { console.log('button clicked');init();}
+        action: function () { levelIndex=0; startTime = Date.now(); init();}
     })
     ButtonArray[0] = aButton;
     // Create Cards
@@ -79,10 +84,10 @@ function init() {
     
     for (var i = 0; i < CardsArray.length; i += 1) {
         CardsArray[i].x = ((canvas.width - (cols * 90)) / 2) + (90 * (i % cols));
-        CardsArray[i].y = 0 + (90 * (Math.floor(i / cols)));
+        CardsArray[i].y = 50 + (90 * (Math.floor(i / cols)));
     }
 }
-function gameLoop() {
+function gameLoop() {	
     if (sleep > 0) {
         sleep--;
         if (sleep == 0) {
@@ -95,68 +100,36 @@ function gameLoop() {
 
     // Clear the canvas
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+	
+	// Draw UI
+	canvas.getContext("2d").font = "20pt Ariel";
+	canvas.getContext("2d").fillText("Concentration", 170, 35);
+	if(numbMatches == totalMatches && levelIndex >= 5)
+	{
+		canvas.getContext("2d").fillText("Finish!!", 5, 440);
+	}
+	else
+	{
+		canvas.getContext("2d").fillText("Level: " + (levelIndex+1), 5, 440);
+		timer = ((Date.now() - startTime)/1000).toFixed(2);
+	}
+	canvas.getContext("2d").fillText("Time Taken: " + timer + "s", 5, 480);
 
+	// Button Loops
     for (var i = 0; i < ButtonArray.length; ++i) {
         ButtonArray[i].update();
         ButtonArray[i].render();
     }
+	// Card Loops
     for (var i = 0; i < CardsArray.length; ++i) {
         CardsArray[i].update();
         CardsArray[i].render();
     }
+	// Increment Level when current level is complete
     if (numbMatches == totalMatches && levelIndex < 5) {
         levelIndex++
         init();
     }
-}
-
-// Fisher–Yates Shuffle http://bost.ocks.org/mike/shuffle/
-function shuffle(array) {
-    var m = array.length, t, i;
-
-    // While there remain elements to shuffle…
-    while (m) {
-
-        // Pick a remaining element…
-        i = Math.floor(Math.random() * m--);
-
-        // And swap it with the current element.
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
-    }
-
-    return array;
-}
-function doubleUp(array) {
-    for (var i = 0; i < array.length; i += 2) {
-        array.splice(i+1, 0, array[i]);
-    }
-    return array;
-}
-function getElementPosition(element) {
-
-    var parentOffset,
-        pos = {
-            x: element.offsetLeft,
-            y: element.offsetTop
-        };
-
-    if (element.offsetParent) {
-        parentOffset = getElementPosition(element.offsetParent);
-        pos.x += parentOffset.x;
-        pos.y += parentOffset.y;
-    }
-    return pos;
-}
-
-function IsPointWithinRect(point, rect) {
-    return (
-        (rect.x1 < point.x) &&
-        (point.x < rect.x2) &&
-        (rect.y1 < point.y) &&
-        (point.y < rect.y2)
-        );
 }
 
 function DefaultClickHandler(e) {
@@ -224,4 +197,56 @@ function CardClickHandler() {
         else
             sleep = 50;
     }
+}
+
+// Helping Methods
+// ***************
+
+// Fisherâ€“Yates Shuffle http://bost.ocks.org/mike/shuffle/
+function shuffle(array) {
+    var m = array.length, t, i;
+
+    // While there remain elements to shuffleâ€¦
+    while (m) {
+
+        // Pick a remaining elementâ€¦
+        i = Math.floor(Math.random() * m--);
+
+        // And swap it with the current element.
+        t = array[m];
+        array[m] = array[i];
+        array[i] = t;
+    }
+
+    return array;
+}
+function doubleUp(array) {
+    for (var i = 0; i < array.length; i += 2) {
+        array.splice(i+1, 0, array[i]);
+    }
+    return array;
+}
+function getElementPosition(element) {
+
+    var parentOffset,
+        pos = {
+            x: element.offsetLeft,
+            y: element.offsetTop
+        };
+
+    if (element.offsetParent) {
+        parentOffset = getElementPosition(element.offsetParent);
+        pos.x += parentOffset.x;
+        pos.y += parentOffset.y;
+    }
+    return pos;
+}
+
+function IsPointWithinRect(point, rect) {
+    return (
+        (rect.x1 < point.x) &&
+        (point.x < rect.x2) &&
+        (rect.y1 < point.y) &&
+        (point.y < rect.y2)
+        );
 }
