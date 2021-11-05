@@ -2,7 +2,7 @@
 A card matching game (based of ["Concentration"](http://en.wikipedia.org/wiki/Concentration_(game))). The rules are simple: you may flip over two cards at once. If they match, they stay flipped up. If they do not, they are flipped back down. There are a number of cards on the field. Goal: Flip them all as quickly as possible.
 
 
-[Play the current build here!](http://jonathanbmiller.com/Games/Concentration/Concentration.aspx)
+[Play the current build here!](https://jonathanbmiller.com/Games/Concentration)
 
 
 ###File Descriptions:
