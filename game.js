@@ -1,40 +1,26 @@
-/* 	Author: Jonathan B. Miller (http://jonathanbmiller.com)
-	Purpose: This file holds the major game loop functionality. It is dependant on "core.js" to function.
-	Special thanks to William Malone (www.williammalone.com) (http://www.williammalone.com/articles/create-html5-canvas-javascript-sprite-animation/)
+/* 	Author: Jonathan B. Miller (https://jonathanbmiller.com)
+    Purpose: This file holds the major game loop functionality. It is dependant on "core.js" to function.
+    Special thanks to William Malone (www.williammalone.com) (http://www.williammalone.com/articles/create-html5-canvas-javascript-sprite-animation/)
  */
 // Get canvas
-var mousePos = { x: 0, y: 0 };
-var canvas = document.getElementById("GameCanvas");
+let mousePos = { x: 0, y: 0 };
+const canvas = document.getElementById("GameCanvas");
 canvas.width = 500;
 canvas.height = 500;
-canvas.addEventListener("touchstart", DefaultClickHandler);
-canvas.addEventListener("mousedown", DefaultClickHandler);
-canvas.addEventListener('mousemove', function (evt) {
-        var rect = canvas.getBoundingClientRect();
-        mousePos = {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
-        };
-    }, false);
-
-// Create & Load sprite sheet
-var cardSpritesheet = new Image();
-cardSpritesheet.addEventListener("load", gameLoop);
-cardSpritesheet.src = "cards.png";
 
 // Holds all visible cards
-var FrameArray = [];
-var CardsArray = [];
-var ButtonArray = [];
+let FrameArray = [];
+let CardsArray = [];
+let ButtonArray = [];
 
 // Milliseconds of sleep
-var sleep = 0;
+let sleep = 0;
 
-var numbSelectedCards = 0;
-var numbMatches = 0;
-var levelIndex = 0;
+let numbSelectedCards = 0;
+let numbMatches = 0;
+let levelIndex = 0;
 // 2x2, 2x3, 2x4, 3x6, 4x8, 5x10
-var levels = { 
+let levels = {
     0: { cols: 2, totalMatches: 2 },
     1: { cols: 2, totalMatches: 3 },
     2: { cols: 2, totalMatches: 4 },
@@ -42,11 +28,10 @@ var levels = {
     4: { cols: 4, totalMatches: 8 },
     5: { cols: 5, totalMatches: 10 }
 };
-var startTime = Date.now();
-var timer = startTime - Date.now();
+let startTime = Date.now();
+let timer = startTime - Date.now();
 
-init();
-function init() {
+const init = function () {
     FrameArray = [];
     CardsArray = [];
     ButtonArray = [];
@@ -58,21 +43,21 @@ function init() {
     // Create Bottom UI
 
     // Create Buttons
-    var aButton = Button({
+    let aButton = Button({
         x: 380,
         y: 435,
         width: 100,
         height: 50,
         text: "Restart",
         context: canvas.getContext("2d"),
-        action: function () { levelIndex=0; startTime = Date.now(); init();}
+        action: function () { levelIndex = 0; startTime = Date.now(); init(); }
     })
     ButtonArray[0] = aButton;
     // Create Cards
     initFrames();
     shuffle(FrameArray);
     doubleUp(FrameArray);
-    for (var i = 0; i < totalMatches * 2; i += 1) {
+    for (let i = 0; i < totalMatches * 2; i += 1) {
         aCard = Card({
             matchID: i - (i % 2),
             cardFace: FrameArray[i],
@@ -81,13 +66,13 @@ function init() {
         CardsArray[CardsArray.length] = aCard;
     }
     shuffle(CardsArray);
-    
-    for (var i = 0; i < CardsArray.length; i += 1) {
+
+    for (let i = 0; i < CardsArray.length; i += 1) {
         CardsArray[i].x = ((canvas.width - (cols * 90)) / 2) + (90 * (i % cols));
         CardsArray[i].y = 50 + (90 * (Math.floor(i / cols)));
     }
 }
-function gameLoop() {	
+const gameLoop = function () {
     if (sleep > 0) {
         sleep--;
         if (sleep == 0) {
@@ -100,45 +85,43 @@ function gameLoop() {
 
     // Clear the canvas
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-	
-	// Draw UI
-	canvas.getContext("2d").font = "20pt Ariel";
-	canvas.getContext("2d").fillText("Concentration", 170, 35);
-	if(numbMatches == totalMatches && levelIndex >= 5)
-	{
-		canvas.getContext("2d").fillText("Finish!!", 5, 440);
-	}
-	else
-	{
-		canvas.getContext("2d").fillText("Level: " + (levelIndex+1), 5, 440);
-		timer = ((Date.now() - startTime)/1000).toFixed(2);
-	}
-	canvas.getContext("2d").fillText("Time Taken: " + timer + "s", 5, 480);
 
-	// Button Loops
-    for (var i = 0; i < ButtonArray.length; ++i) {
+    // Draw UI
+    canvas.getContext("2d").font = "20pt Ariel";
+    canvas.getContext("2d").fillText("Concentration", 170, 35);
+    if (numbMatches == totalMatches && levelIndex >= 5) {
+        canvas.getContext("2d").fillText("Finish!!", 5, 440);
+    }
+    else {
+        canvas.getContext("2d").fillText("Level: " + (levelIndex + 1), 5, 440);
+        timer = ((Date.now() - startTime) / 1000).toFixed(2);
+    }
+    canvas.getContext("2d").fillText("Time Taken: " + timer + "s", 5, 480);
+
+    // Button Loops
+    for (let i = 0; i < ButtonArray.length; ++i) {
         ButtonArray[i].update();
         ButtonArray[i].render();
     }
-	// Card Loops
-    for (var i = 0; i < CardsArray.length; ++i) {
+    // Card Loops
+    for (let i = 0; i < CardsArray.length; ++i) {
         CardsArray[i].update();
         CardsArray[i].render();
     }
-	// Increment Level when current level is complete
+    // Increment Level when current level is complete
     if (numbMatches == totalMatches && levelIndex < 5) {
         levelIndex++
         init();
     }
 }
 
-function DefaultClickHandler(e) {
+const DefaultClickHandler = function (e) {
     ButtonClickHandler();
     CardClickHandler();
 }
-function ButtonClickHandler() {
-    for (var i = 0; i < ButtonArray.length; ++i) {
-        var isWithin = false;
+const ButtonClickHandler = function () {
+    for (let i = 0; i < ButtonArray.length; ++i) {
+        let isWithin = false;
         isWithin = IsPointWithinRect(
             { x: mousePos.x, y: mousePos.y },
             {
@@ -152,13 +135,13 @@ function ButtonClickHandler() {
         }
     }
 }
-function CardClickHandler() {
+const CardClickHandler = function () {
     if (sleep > 0)
         return;
 
     for (i = 0; i < CardsArray.length; i += 1) {
         // Check for mouse click collision with coin
-        var isWithin = false;
+        let isWithin = false;
         isWithin = IsPointWithinRect(
             { x: mousePos.x, y: mousePos.y },
             {
@@ -177,8 +160,8 @@ function CardClickHandler() {
 
     if (numbSelectedCards >= 2) {
         numbSelectedCards = 0;
-        var cardA = null;
-        var cardB = null;
+        let cardA = null;
+        let cardB = null;
         for (i = 0; i < CardsArray.length; i += 1) {
             if (CardsArray[i].isSelected) {
                 if (!cardA) cardA = CardsArray[i];
@@ -203,8 +186,8 @@ function CardClickHandler() {
 // ***************
 
 // Fisher–Yates Shuffle http://bost.ocks.org/mike/shuffle/
-function shuffle(array) {
-    var m = array.length, t, i;
+const shuffle = function (array) {
+    let m = array.length, t, i;
 
     // While there remain elements to shuffle…
     while (m) {
@@ -220,15 +203,15 @@ function shuffle(array) {
 
     return array;
 }
-function doubleUp(array) {
-    for (var i = 0; i < array.length; i += 2) {
-        array.splice(i+1, 0, array[i]);
+const doubleUp = function (array) {
+    for (let i = 0; i < array.length; i += 2) {
+        array.splice(i + 1, 0, array[i]);
     }
     return array;
 }
-function getElementPosition(element) {
+const getElementPosition = function (element) {
 
-    var parentOffset,
+    let parentOffset,
         pos = {
             x: element.offsetLeft,
             y: element.offsetTop
@@ -242,11 +225,35 @@ function getElementPosition(element) {
     return pos;
 }
 
-function IsPointWithinRect(point, rect) {
+const IsPointWithinRect = function (point, rect) {
     return (
         (rect.x1 < point.x) &&
         (point.x < rect.x2) &&
         (rect.y1 < point.y) &&
         (point.y < rect.y2)
-        );
+    );
 }
+
+
+/* Initalization
+********/
+// Create & Load sprite sheet
+let cardSpritesheet = new Image();
+cardSpritesheet.addEventListener("load", gameLoop);
+cardSpritesheet.src = "/data/Concentration/cards.png";
+
+// Setup canvas events
+canvas.addEventListener("touchstart", DefaultClickHandler, {
+    passive: true
+});
+canvas.addEventListener("mousedown", DefaultClickHandler);
+canvas.addEventListener('mousemove', function (evt) {
+    let rect = canvas.getBoundingClientRect();
+    mousePos = {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
+}, false);
+
+// Init
+init();
